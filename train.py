@@ -52,6 +52,7 @@ import torchvision.models.detection.mask_rcnn
 from coco_utils import get_coco_api_from_dataset
 from coco_eval import CocoEvaluator
 
+<<<<<<< HEAD
 def run_one_epoch(cfg, model, optimizer, lr_scheduler, data_loader, epoch, mode='Train'):
 
     # now = str(re.sub('[^0-9]', '', str(datetime.datetime.now())))
@@ -60,6 +61,16 @@ def run_one_epoch(cfg, model, optimizer, lr_scheduler, data_loader, epoch, mode=
     metric_logger = utils.MetricLogger(delimiter="  ")
     metric_logger.add_meter('lr', utils.SmoothedValue(window_size=1, fmt='{value:.6f}'))
     header = '\033[31m{} Epoch: {}\033[00m'.format(mode, epoch)
+=======
+def train_one_epoch(cfg, model, optimizer, lr_scheduler, data_loader, epoch):
+
+    # now = str(re.sub('[^0-9]', '', str(datetime.datetime.now())))
+
+    model.train()
+    metric_logger = utils.MetricLogger(delimiter="  ")
+    metric_logger.add_meter('lr', utils.SmoothedValue(window_size=1, fmt='{value:.6f}'))
+    header = '\033[31mEpoch: {}\033[00m'.format(epoch)
+>>>>>>> 773da0c858c882086c74f7ea3b2a6229e9b1a0bd
 
     lr_scheduler = None
 
@@ -83,6 +94,7 @@ def run_one_epoch(cfg, model, optimizer, lr_scheduler, data_loader, epoch, mode=
 
         loss_value = losses_reduced.item()
 
+<<<<<<< HEAD
         if mode == 'Train':
 
             if not math.isfinite(loss_value):
@@ -96,12 +108,29 @@ def run_one_epoch(cfg, model, optimizer, lr_scheduler, data_loader, epoch, mode=
 
             if lr_scheduler is not None:
                 lr_scheduler.step()
+=======
+        if not math.isfinite(loss_value):
+            print("Loss is {}, stopping training".format(loss_value))
+            print(loss_dict_reduced)
+            sys.exit(1)
+
+        optimizer.zero_grad()
+        losses.backward()
+        optimizer.step()
+
+        if lr_scheduler is not None:
+            lr_scheduler.step()
+>>>>>>> 773da0c858c882086c74f7ea3b2a6229e9b1a0bd
 
         metric_logger.update(loss=losses_reduced, **loss_dict_reduced)
         metric_logger.update(lr=optimizer.param_groups[0]["lr"])
 
+<<<<<<< HEAD
     if mode == 'Train':
         lr_scheduler.step()
+=======
+    lr_scheduler.step()
+>>>>>>> 773da0c858c882086c74f7ea3b2a6229e9b1a0bd
 
     return metric_logger
 
@@ -121,20 +150,36 @@ def evaluate(cfg, model, data_loader, device):
 
     for images, targets in metric_logger.log_every(data_loader, 100, header):
         images = list(img.to(device) for img in images)
+<<<<<<< HEAD
         # targets = [{k: v.to(cfg.DEVICE) for k, v in t.items()} for t in targets]
+=======
+        targets = [{k: v.to(cfg.DEVICE) for k, v in t.items()} for t in targets]
+>>>>>>> 773da0c858c882086c74f7ea3b2a6229e9b1a0bd
 
         if torch.cuda.is_available():
             torch.cuda.synchronize()
             
+<<<<<<< HEAD
         model_time = time.time()
         loss_dict = model(images)
         # print(loss_dict)
+=======
+        print(len(images))
+        model_time = time.time()
+        loss_dict = model(images, targets)
+        print(loss_dict)
+>>>>>>> 773da0c858c882086c74f7ea3b2a6229e9b1a0bd
         
         outputs = [{k: v.to(cpu_device) for k, v in t.items()} for t in loss_dict]
 
         # reduce losses over all GPUs for logging purposes
+<<<<<<< HEAD
         # loss_dict_reduced = utils.reduce_dict(loss_dict)
         # losses_reduced = sum(loss for loss in loss_dict_reduced.values())
+=======
+        loss_dict_reduced = utils.reduce_dict(loss_dict)
+        losses_reduced = sum(loss for loss in loss_dict_reduced.values())
+>>>>>>> 773da0c858c882086c74f7ea3b2a6229e9b1a0bd
 
         model_time = time.time() - model_time
 
@@ -143,7 +188,11 @@ def evaluate(cfg, model, data_loader, device):
         coco_evaluator.update(res)
         evaluator_time = time.time() - evaluator_time
         metric_logger.update(model_time=model_time, evaluator_time=evaluator_time)
+<<<<<<< HEAD
         # metric_logger.update(loss=losses_reduced, **loss_dict_reduced)
+=======
+        metric_logger.update(loss=losses_reduced, **loss_dict_reduced)
+>>>>>>> 773da0c858c882086c74f7ea3b2a6229e9b1a0bd
 
     # gather the stats from all processes
     metric_logger.synchronize_between_processes()
@@ -302,7 +351,11 @@ def main(config_file):
     for epoch in range(cfg.NUM_EPOCHS):
 
         # TRAIN
+<<<<<<< HEAD
         metric_logger_train = run_one_epoch(cfg, model, optimizer, lr_scheduler, dataloader_train, epoch, mode='Train')
+=======
+        metric_logger_train = train_one_epoch(cfg, model, optimizer, lr_scheduler, dataloader_train, epoch)
+>>>>>>> 773da0c858c882086c74f7ea3b2a6229e9b1a0bd
         train_loss.append(metric_logger_train.meters['loss'].value)
         train_loss_classifier.append(metric_logger_train.meters['loss_classifier'].value)
         train_loss_box_reg.append(metric_logger_train.meters['loss_box_reg'].value)
@@ -310,15 +363,23 @@ def main(config_file):
         train_loss_rpn_box_reg.append(metric_logger_train.meters['loss_rpn_box_reg'].value)
 
         # EVAL
+<<<<<<< HEAD
         metric_logger_valid = run_one_epoch(cfg, model, optimizer, lr_scheduler, dataloader_train, epoch, mode='Valid')
+=======
+        metric_logger_valid = evaluate(cfg, model, dataloader_valid, device=cfg.DEVICE)
+        print(metric_logger_valid.meters)
+>>>>>>> 773da0c858c882086c74f7ea3b2a6229e9b1a0bd
         valid_loss.append(metric_logger_valid.meters['loss'].value)
         valid_loss_classifier.append(metric_logger_valid.meters['loss_classifier'].value)
         valid_loss_box_reg.append(metric_logger_valid.meters['loss_box_reg'].value)
         valid_loss_objectness.append(metric_logger_valid.meters['loss_objectness'].value)
         valid_loss_rpn_box_reg.append(metric_logger_valid.meters['loss_rpn_box_reg'].value)
 
+<<<<<<< HEAD
         evaluate(cfg, model, dataloader_valid, device=cfg.DEVICE)
 
+=======
+>>>>>>> 773da0c858c882086c74f7ea3b2a6229e9b1a0bd
         ###################################
         # Save checkpoint and make config #
         ###################################
@@ -346,7 +407,11 @@ def main(config_file):
                 "optimizer": optimizer.state_dict(),
                 "configs": option_dict,
             },
+<<<<<<< HEAD
             prefix=cfg.PREFIX,
+=======
+            prefix=cfg.prefix,
+>>>>>>> 773da0c858c882086c74f7ea3b2a6229e9b1a0bd
         )
 
         # log_file.write(output_string + "\n")

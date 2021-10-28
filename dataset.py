@@ -42,7 +42,11 @@ class CustomCOCODataset(Dataset):
         self.ann_path = ann_path
         self.transforms = transforms
 
+<<<<<<< HEAD
         self.imgs = sorted(glob.glob(os.path.join(self.img_path, '*.jpg')))
+=======
+        self.imgs = sorted(glob.glob(os.path.join(self.img_path, '*.jpg')))[:10]
+>>>>>>> 773da0c858c882086c74f7ea3b2a6229e9b1a0bd
         self.anns = COCO(self.ann_path)
         self.anns_ids = self.anns.getCatIds()
         self.anns_iscrowd = False
