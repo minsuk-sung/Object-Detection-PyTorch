@@ -1,0 +1,41 @@
+SEED: 42
+DEVICE: 'cuda'
+
+DATA:
+  TRAIN_IMG_PATH: '/DATASET/COCO2017/images/train2017'
+  TRAIN_ANN_PATH: '/DATASET/COCO2017/annotations/instances_train2017.json'
+  VALID_IMG_PATH: '/DATASET/COCO2017/images/val2017'
+  VALID_ANN_PATH: '/DATASET/COCO2017/annotations/instances_val2017.json'
+
+NETWORK:
+  NAME: "Faster R-CNN"
+  PRETRAINED: False
+
+OPTIMIZER:
+  TYPE: 'Adam' # Adam, Adadelta
+  LR: 1e-4 # 1e-4
+  WEIGHT_DECAY_RATE: 1e-2
+
+LR_SCHEDULER:
+  STEP_SIZE: 5
+  GAMMA: 0.1
+
+CHECKPOINT: "" 
+# checkpoint: "./log/VGG/checkpoints/0003.pth"
+test_checkpoint: "./log/VGG_NP/checkpoints/0020.pth"
+
+experiment:
+  vis_input: "samples/fake.jpg"
+  vis_output: "./results"
+
+PREFIX: "./log/FASTER-RCNN"
+
+BATCH_SIZE: 1
+SHUFFLE: False
+NUM_WORKERS: 0
+NUM_EPOCHS: 10
+PRINT_EPOCHS: 1
+PRINT_FREQ: 100
+DROPOUT_RATE: 0.1
+EARLY_STOPPING_EPOCH: 5
+
